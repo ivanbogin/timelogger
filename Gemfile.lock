@@ -30,7 +30,7 @@ PLATFORMS
 
 DEPENDENCIES
   octokit (~> 4.0)
-  rspec
+  rspec (~> 3.4)
 
 BUNDLED WITH
    1.11.2
