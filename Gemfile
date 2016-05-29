@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
-gem "octokit", "~> 4.0"
+gem 'rspec', '~> 3.4'
+gem 'octokit', '~> 4.0'
