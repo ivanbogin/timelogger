@@ -10,13 +10,19 @@ class GithubBrowser
     @login = @client.login
   end
 
-  def created_pull_requests
-    prs = @client.search_issues "author:#{@login} type:pr"
+  def created_pull_requests(date_from)
+    created = date_from.to_s
+    prs = @client.search_issues(
+      "author:#{@login} type:pr created:>=#{created}"
+    )
     prs.items
   end
 
-  def commented_pull_requests
-    prs = @client.search_issues "commenter:#{@login} type:pr"
+  def commented_pull_requests(date_from)
+    created = date_from.to_s
+    prs = @client.search_issues(
+      "commenter:#{@login} type:pr created:>=#{created}"
+    )
     prs.items
   end
 
