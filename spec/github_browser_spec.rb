@@ -1,8 +1,8 @@
-require 'github_parser'
+require 'github_browser'
 
-RSpec.describe GithubParser, '#normalize_git_message' do
+RSpec.describe GithubBrowser, '#normalize_git_message' do
   it 'removes new lines from commit message' do
-    parser = GithubParser.new 'test', 'test'
+    parser = GithubBrowser.new 'test', 'test'
     result = parser.normalize_git_message(
       "Same shit, \nbetter smell, \r\nonly 1 query,\r\n\neasy to count."
     )
@@ -10,7 +10,7 @@ RSpec.describe GithubParser, '#normalize_git_message' do
   end
 
   it 'removes merge text from message' do
-    parser = GithubParser.new 'test', 'test'
+    parser = GithubBrowser.new 'test', 'test'
     result = parser.normalize_git_message(
       'Merge branch \'master\' of github.com:Company/API into ' \
       "TEST-1570-improve-webhooks. \r\nImportant text."

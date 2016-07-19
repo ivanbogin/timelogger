@@ -1,7 +1,14 @@
+# Working time list
 class TimeSheet
-  @entries = []
+  attr_reader :entries
 
-  def add_entry(datetime, description)
-    @entries << {:date => datetime, :description => description}
+  def initialize
+    @entries = {}
+  end
+
+  def add(id, date, description)
+    @entries[id] = {
+      id: id, date: date, description: description
+    }
   end
 end

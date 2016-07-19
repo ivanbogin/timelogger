@@ -1,35 +1,44 @@
 # get list of all commits prepared with dates which will go to toggl
 # (dry-run param)
 
-require_relative 'lib/github_parser'
+require_relative 'lib/github_browser'
+require_relative 'lib/timesheet'
 require 'optparse'
 
-options = {}
+github_token = nil
 OptionParser.new do |opt|
-  opt.on('-a',
-         '--author AUTHOR',
-         'Author of commits (guthub username)') do |o|
-    options[:author] = o
-  end
-  opt.on('-r',
-         '--repositories REPOSITORIES',
-         'Repositories to parse, separated by comma') do |o|
-    options[:repositories] = o
-  end
-  opt.on('-f',
-         '--file FILENAME',
-         'Export result to csv file with the specified name') do |o|
-    options[:repositories] = o
+  opt.on('-t',
+         '--token TOKEN',
+         'Github token') do |o|
+    github_token = o
   end
 end.parse!
 
-raise 'GITHUB_TOKEN must be set in environment' unless ENV['GITHUB_TOKEN']
-raise 'Set repositories with -r REPOSITORIES' unless options[:repositories]
-raise 'Set author with -a AUTHOR' unless options[:author]
+raise 'Set Github token with -t TOKEN' unless github_token
 
-repositories = options[:repositories].split(',').collect(&:strip)
+browser = GithubBrowser.new github_token
 
-parser = GithubParser.new options[ENV['GITHUB_TOKEN']], repositories
-commits = parser.get_commits_by_author(options[:author])
+timesheet = TimeSheet.new
 
-require 'pry'; binding.pry
+# Fetch own PRs
+browser.created_pull_requests.each do |pr|
+  timesheet.add pr.id, pr.created_at, pr.title
+end
+
+# Fetch commented PRs
+browser.commented_pull_requests.each do |pr|
+  if pr.user.login == browser.login
+    title = pr.title
+  else
+    title = 'Peer Review: ' << pr.title
+  end
+  timesheet.add pr.id, pr.created_at, title
+end
+
+entries = timesheet.entries.sort
+
+entries.each do |i, e|
+  date = e[:date]
+  description = e[:description]
+  puts "#{date} #{description}"
+end
