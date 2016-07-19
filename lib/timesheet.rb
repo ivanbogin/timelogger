@@ -26,7 +26,7 @@ class TimeSheet
 
     entries.each_with_index do |current, i|
       current_date = current[:date]
-      if current[:hours] < 8
+      if current[:hours] < 5
         result << {
           date: current[:date].to_s,
           description: current[:description],
@@ -39,10 +39,9 @@ class TimeSheet
       else
         previous = entries[i - 1]
         previous_date = previous[:date]
-        previous_date = previous_date.next_day if previous[:hours] > 5
       end
 
-      current_date.downto(previous_date) do |date|
+      current_date.downto(previous_date.prev_day) do |date|
         # skip weekends
         next unless date.cwday < 6
         result << {
