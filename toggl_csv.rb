@@ -29,14 +29,21 @@ date_from = Date.strptime(option_from, '%Y%m%d')
 
 # Fetch own PRs
 browser.created_pull_requests(date_from).each do |pr|
-  timesheet.add pr.id, pr.created_at, pr.title, 7
+  timesheet.add pr.id, pr.created_at, pr.title, Random.rand(2...8)
 end
 
-# Fetch commented PRs (Code reviews)
-browser.commented_pull_requests(date_from).each do |pr|
-  next if pr.user.login == browser.login
-  title = 'CR ' << pr.title
-  timesheet.add pr.id, pr.created_at, title, 1
+# Fetch all user involved issues (own PRs, code reviews)
+browser.mentioned_issues(date_from).each do |pr|
+  title = pr.title
+  hours = Random.rand(5...8)
+
+  # Core reviews
+  if pr.user.login != browser.login
+    title = 'CR ' << title
+    hours = Random.rand(1...2)
+  end
+
+  timesheet.add pr.id, pr.created_at, title, hours
 end
 
 timesheet.calculated_entries.each do |e|

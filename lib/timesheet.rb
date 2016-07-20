@@ -28,8 +28,8 @@ class TimeSheet
         result << {
           date: current[:date].to_s,
           description: current[:description],
-          time: '17:00:00',
-          duration: "#{current[:hours]}:00:00"
+          time: '%02d:%02d:00' % [Random.rand(9...12), Random.rand(0...59)],
+          duration: '%02d:00:00' % current[:hours]
         }
         next
       end
@@ -45,11 +45,12 @@ class TimeSheet
       current_date.upto(next_date) do |date|
         # skip weekends
         next unless date.cwday < 6
+        time_started = '%02d:%02d:00' % [Random.rand(9...12), Random.rand(0...59)]
         result << {
           date: date.to_s,
           description: current[:description],
-          time: '9:00:00',
-          duration: '7:00:00'
+          time: time_started,
+          duration: '%02d:%02d:00' % [Random.rand(3...8), Random.rand(0...59)]
         }
       end
     end

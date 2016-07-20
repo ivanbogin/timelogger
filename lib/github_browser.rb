@@ -18,10 +18,10 @@ class GithubBrowser
     prs.items
   end
 
-  def commented_pull_requests(date_from)
+  def mentioned_issues(date_from)
     created = date_from.to_s
     prs = @client.search_issues(
-      "commenter:#{@login} type:pr created:>=#{created}"
+      "mentions:#{@login} created:>=#{created}"
     )
     prs.items
   end
