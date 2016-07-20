@@ -4,9 +4,12 @@
 require_relative 'lib/github_browser'
 require_relative 'lib/timesheet'
 require 'optparse'
+require 'csv'
 
 github_token = nil
 option_from = nil
+project_name = ''
+email = ''
 OptionParser.new do |opt|
   opt.on('-t',
          '--token TOKEN',
@@ -17,6 +20,16 @@ OptionParser.new do |opt|
          '--date YYYYMMDD',
          'Starting date') do |o|
     option_from = o
+  end
+  opt.on('-p',
+         '--project PROJECT',
+         'Project name') do |o|
+    project_name = o
+  end
+  opt.on('-e',
+         '--email EMAIL',
+         'User email') do |o|
+    email = o
   end
 end.parse!
 
@@ -46,6 +59,10 @@ browser.mentioned_issues(date_from).each do |pr|
   timesheet.add pr.id, pr.created_at, title, hours
 end
 
-timesheet.calculated_entries.each do |e|
-  puts "#{e[:date]};#{e[:description]};#{e[:time]};#{e[:duration]}"
+CSV.open('toggl.csv', 'w') do |csv|
+  csv << ['Email', 'Project', 'Description', 'Start date', 'Start time', 'Duration']
+  timesheet.calculated_entries.each do |e|
+    csv << [email, project_name, e[:description], e[:date], e[:time], e[:duration]]
+    puts "#{e[:date]} #{e[:description]} #{e[:time]} #{e[:duration]}"
+  end
 end
