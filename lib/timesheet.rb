@@ -22,8 +22,6 @@ class TimeSheet
     result = []
     entries = @entries.sort_by { |h| h[:id] }
 
-    # require 'pry'; binding.pry
-
     entries.each_with_index do |current, i|
       current_date = current[:date]
       if current[:hours] < 5
@@ -34,14 +32,17 @@ class TimeSheet
           duration: "#{current[:hours]}:00:00"
         }
         next
-      elsif i == 0
-        previous_date = entries[0][:date]
-      else
-        previous = entries[i - 1]
-        previous_date = previous[:date]
       end
 
-      current_date.downto(previous_date.prev_day) do |date|
+      next_entry = entries[i + 1]
+
+      if next_entry == nil
+        next_date = current_date.next_day
+      else
+        next_date = next_entry[:date]
+      end
+
+      current_date.upto(next_date) do |date|
         # skip weekends
         next unless date.cwday < 6
         result << {
